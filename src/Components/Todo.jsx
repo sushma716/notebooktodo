@@ -8,7 +8,7 @@ const Todo = ({ title, checkTodo, id, isCompleted, deleteTodo }) => {
     const todoStyle = isCompleted ? { textDecoration: "line-through" } : { textDecoration: "none" }
     return (
         <div>
-            <Container>
+            <Container >
                 <Card Variant="outlined" style={{ marginTop: 5, background: "lightgray" }} >
                     <CardContent>
                         <Typography Variant="h5" component="h2" style={todoStyle}>
@@ -19,7 +19,6 @@ const Todo = ({ title, checkTodo, id, isCompleted, deleteTodo }) => {
                             <IconButton style={{ float: "right" }} onClick={delTodo}>
                                 <Delete style={{ color: "Red" }} />
                             </IconButton>
-
                         </Typography>
                     </CardContent>
 

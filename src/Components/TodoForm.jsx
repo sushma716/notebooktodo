@@ -1,40 +1,50 @@
 import React, { useState } from 'react'
-import { FormControl, Container, TextField, Button } from '@material-ui/core';
-
-const TodoForm = ({ addTodo }) => {
-    const [text, setText] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
-    const handleChange = event => {
-        setSearchTerm(event.target.value);
-    };
-
+import { FormControl, Container, TextField, Button, MenuItem, Select } from '@material-ui/core';
+const TodoForm = ({ addTodo, handleSearch }) => {
+    const [text, setText] = useState({});
     const handleSubmit = (e) => {
         e.preventDefault();
         addTodo(text);
-        setText("")
     };
+    const handleChange = (e) => {
+        setText({ ...text, [e.target.name]: e.target.value })
+    }
+    const { todo, category } = text;
+    console.log({ text })
     return (
         <div>
             <Container maxWidth="sm">
                 <form onSubmit={handleSubmit}>
                     <FormControl>
-                        <TextField label=""
-                            required={true}
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
-                        />
-                        <Button variant="contained" color="primary" style={{ margin: 5 }} type="submit">
-                            Add
-                        </Button>
+                        <div className="Textfield">
+                            <TextField id="outlined-basic" label="" variant="outlined"
+                                required={true}
+                                value={todo}
+                                name="todo"
+                                onChange={(e) => handleChange(e)}
+                            />
+                        </div>
                     </FormControl>
+                    <select className="category" name="category" onChange={handleChange}>
+                        <option aria-label="None" value="" />
+                        <optgroup label="" style={{ fontSize: 20 }}>
+                            <option value="volvo">volvo</option>
+                            <option value="saab">saab</option>
+                            <option value="saab">benz</option>
+                            <option value="saab">aud</option>
+                        </optgroup>
+                    </select>
+                    <Button variant="contained" color="primary" style={{ margin: 5, }} type="submit">
+                        Add
+                    </Button>
                 </form>
                 <input
+                    className="search"
                     type="text"
                     placeholder="Search"
-                    value={searchTerm}
-                    onChange={handleChange}
+                    onChange={handleSearch}
                 />
-            </Container>
+            </Container >
         </div >
     )
 }

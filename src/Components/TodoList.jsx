@@ -18,4 +18,3 @@ const TodoList = ({ todos, checkTodo, deleteTodo }) => {
 };
 
 export default TodoList;
-s
