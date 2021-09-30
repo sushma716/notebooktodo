@@ -1,98 +1,94 @@
-import React, { useState } from 'react';
-import { v4 } from 'uuid';
-import { Container, Card, CardContent, Typography, IconButton } from '@material-ui/core';
-import TodoForm from './Components/TodoForm';
-import TodoList from './Components/TodoList';
-import './App.css';
+import { useEffect, useState } from "react";
+import uuid from "react-uuid";
+import "./App.css";
+import Main from "./Main/Main";
+import Sidebar from "./Sidebar/Sidebar";
 
 function App() {
-  const [todos, setTodos] = useState([]);
+  const [notes, setNotes] = useState(
+    localStorage.notes ? JSON.parse(localStorage.notes) : []
+  );
   const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState(['Work', 'home', 'personal']);
+  const [activeNote, setActiveNote] = useState(false);
 
-  const checkTodo = (id) => {
-    console.log(checkTodo);
-    setTodos(todos.map((todo) => {
-      if (todo.id === id) todo.isCompleted = !todo.isCompleted;
-      console.log(todo.isCompleted);
-      return todo;
-    }))
+  useEffect(() => {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  }, [notes]);
+
+  const onAddNote = (obj) => {
+    const { title, category } = obj;
+    const newNote = {
+      id: uuid(),
+      title,
+      body: "",
+      category,
+      lastModified: Date.now(),
+    };
+
+    setNotes([newNote, ...notes]);
+  };
+
+  const onDeleteNote = (noteId) => {
+    setNotes(notes.filter(({ id }) => id !== noteId));
+  };
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value)
   }
 
-  const deleteTodo = (id) => {
-    console.log(deleteTodo);
-    setTodos(todos.filter((todo => todo.id !== id)));
+
+
+
+  const onUpdateNote = (updatedNote) => {
+    const updatedNotesArr = notes.map((note) => {
+      if (note.id === updatedNote.id) {
+        return updatedNote;
+      }
+
+      return note;
+    });
+
+    setNotes(updatedNotesArr);
   };
 
-  const addTodo = (text) => {
-    const { todo, category } = text
-    const newTodo = {
-      id: v4(),
-      title: todo,
-      category,
-      isCompleted: false
-    };
-    console.log({ newTodo })
-    setTodos([...todos, newTodo])
+  const addCategory = (option) => {
+    categories.push(option);
+    setCategories([...categories]);
+  }
 
-  };
-
-
-  const handleSearch = event => {
-    setSearchTerm(event.target.value);
-  };
-
-  function groupBy(objectArray, property) {
-    return objectArray.reduce((acc, obj) => {
-      const key = obj[property];
+  function groupBy(todos, property) {
+    return todos.reduce((acc, obj) => {
+      console.log({ obj })
+      const key = obj['category']; // undefined
+      console.log({ key })
       if (!acc[key]) {
-        acc[key] = [];
+        acc[key] = []; // { saab: [], volvo:[], mercedes: [] }
       }
       // Add object to list for given key's value
+      console.log(acc[key])
       acc[key].push(obj);
       return acc;
     }, {});
   }
 
-  const renderCategory = (category) => {
-    return groupCategories[category].length ? groupCategories[category].map(item => {
-      return (<Card Variant="outlined" style={{ marginTop: 5, background: "#c000ff", width: 1250, marginLeft: 180 }} >
-        <CardContent>
-          <Typography Variant="h5" component="h2">
-            {item.title}
-          </Typography>
-        </CardContent>
+  const todoData = notes.filter(todo => todo.title.includes(searchTerm));
+  const groupCategories = groupBy(todoData, 'category');
 
-      </Card >)
-    }) : ''
-  }
-
-  const groupCategories = groupBy(todos, 'category');
-  console.log({ groupCategories })
-
-  const todoData = todos.filter(todo => todo.title.includes(searchTerm));
+  console.log({ notes, groupCategories })
   return (
-    <div>
-      <TodoForm
-        addTodo={addTodo}
-        handleSearch={handleSearch}
-      />
-      <TodoList
-        todos={todoData}
-        checkTodo={checkTodo}
-        deleteTodo={deleteTodo}
-      />
-      <div>
-        <h2>Category:</h2>
-        {Object.keys(groupCategories).length ? Object.keys(groupCategories).map(category => {
-
-          return (<>
-            <h2>{category}</h2>
-            {renderCategory(category)}
-          </>)
-
-        }) : ''}
+    <div className="container">
+      <input className="search" type="text" placeholder="note search" onChange={handleSearch} />
+      <div className="App">
+        <Sidebar
+          notes={todoData}
+          onAddNote={onAddNote}
+          onDeleteNote={onDeleteNote}
+          categories={categories}
+        />
+        <Main notes={groupCategories} addCategory={addCategory} />
       </div>
     </div>
-  )
+  );
 }
+
 export default App;
